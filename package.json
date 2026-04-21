@@ -1,0 +1,14 @@
+{
+  "name": "claudecurate",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "server": "npm --prefix server start",
+    "server:dev": "npm --prefix server run dev",
+    "client": "npm --prefix client start",
+    "client:test": "npm --prefix client test",
+    "server:test": "npm --prefix server test",
+    "test": "npm --prefix server test && npm --prefix client test",
+    "install:all": "npm --prefix server install && npm --prefix client install"
+  }
+}
