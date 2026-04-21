@@ -18,7 +18,22 @@ connectDB()
 const app = express()
 
 app.use(helmet())
-app.use(cors({ origin: process.env.CLIENT_URL || 'http://localhost:3000' }))
+const allowedOrigins = [
+  'http://localhost:3000',
+  process.env.CLIENT_URL,
+].filter(Boolean)
+
+app.use(cors({
+  origin: (origin, callback) => {
+    // allow server-to-server requests (no origin) and anything on vercel.app
+    if (!origin || allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
+      callback(null, true)
+    } else {
+      callback(new Error(`CORS blocked: ${origin}`))
+    }
+  },
+  credentials: true
+}))
 app.use(express.json())
 
 app.use('/api/auth', authRoutes)
