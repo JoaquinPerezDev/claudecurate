@@ -20,7 +20,7 @@ export async function register(req, res, next) {
     res.status(201).json({
       token,
       webhookToken: user.webhookToken,
-      user: { id: user._id, email: user.email }
+      user: { id: user._id, email: user.email, language: user.language }
     })
   } catch (err) {
     next(err)
@@ -41,7 +41,7 @@ export async function login(req, res, next) {
     res.json({
       token,
       webhookToken: user.webhookToken,
-      user: { id: user._id, email: user.email }
+      user: { id: user._id, email: user.email, language: user.language }
     })
   } catch (err) {
     next(err)
@@ -56,6 +56,19 @@ export async function regenerateToken(req, res, next) {
       { new: true }
     )
     res.json({ webhookToken: user.webhookToken })
+  } catch (err) {
+    next(err)
+  }
+}
+
+export async function updateLanguage(req, res, next) {
+  try {
+    const { language } = req.body
+    if (!['en', 'es'].includes(language)) {
+      return res.status(400).json({ message: 'Language must be en or es' })
+    }
+    const user = await User.findByIdAndUpdate(req.user.id, { language }, { new: true })
+    res.json({ language: user.language })
   } catch (err) {
     next(err)
   }

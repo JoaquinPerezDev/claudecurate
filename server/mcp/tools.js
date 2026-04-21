@@ -52,13 +52,17 @@ export const toolDefinitions = [
 
 export async function handleTool(name, args) {
   if (name === 'list_tasks') {
-    const tasks = await apiFetch('/api/webhook/mcp/tasks')
+    const { tasks, language } = await apiFetch('/api/webhook/mcp/tasks')
+    const langHint = language === 'es'
+      ? '⚠️ Este usuario habla español. Cuando uses log_session, escribe la descripción EN ESPAÑOL para que coincida con los títulos de las tareas.'
+      : '⚠️ This user speaks English. When calling log_session, write the description in ENGLISH to match task titles.'
+
     return {
       content: [{
         type: 'text',
         text: tasks.length
-          ? tasks.map(t => `[${t._id}] ${t.title} (${t.status})${t.subtasks?.length ? `\n  Subtasks: ${t.subtasks.map(s => `${s.title} [${s.status}]`).join(', ')}` : ''}`).join('\n')
-          : 'No pending tasks.'
+          ? `${langHint}\n\n${tasks.map(t => `[${t._id}] ${t.title} (${t.status})${t.subtasks?.length ? `\n  Subtasks: ${t.subtasks.map(s => `${s.title} [${s.status}]`).join(', ')}` : ''}`).join('\n')}`
+          : `${langHint}\n\nNo pending tasks.`
       }]
     }
   }

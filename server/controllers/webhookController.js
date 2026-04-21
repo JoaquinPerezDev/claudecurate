@@ -47,7 +47,7 @@ export async function mcpListTasks(req, res, next) {
     if (!user) return res.status(401).json({ message: 'Invalid webhook token' })
 
     const tasks = await Task.find({ user: user._id, status: { $ne: 'complete' } }).sort({ createdAt: -1 })
-    res.json(tasks)
+    res.json({ tasks, language: user.language })
   } catch (err) {
     next(err)
   }

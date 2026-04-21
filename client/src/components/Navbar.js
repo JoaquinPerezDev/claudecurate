@@ -5,10 +5,13 @@ import DashboardIcon from '@mui/icons-material/Dashboard'
 import PersonIcon from '@mui/icons-material/Person'
 import LogoutIcon from '@mui/icons-material/Logout'
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '../context/AuthContext'
+import LanguageToggle from './LanguageToggle'
 
 export default function Navbar() {
   const { user, logout } = useAuth()
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const location = useLocation()
   const theme = useTheme()
@@ -30,11 +33,11 @@ export default function Navbar() {
         <Box sx={{ pb: 7 }} />
         <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 100 }} elevation={3}>
           <BottomNavigation value={route} onChange={(_, val) => navigate(val)} showLabels>
-            <BottomNavigationAction label="Dashboard" value="/dashboard" icon={<DashboardIcon />} />
-            <BottomNavigationAction label="Profile" value="/profile" icon={<PersonIcon />} />
+            <BottomNavigationAction label={t('nav.dashboard')} value="/dashboard" icon={<DashboardIcon />} />
+            <BottomNavigationAction label={t('nav.profile')} value="/profile" icon={<PersonIcon />} />
           </BottomNavigation>
         </Paper>
-        <Snackbar open={copied} autoHideDuration={2000} onClose={() => setCopied(false)} message="Webhook token copied!" />
+        <Snackbar open={copied} autoHideDuration={2000} onClose={() => setCopied(false)} message={t('nav.tokenCopied')} />
       </>
     )
   }
@@ -47,14 +50,15 @@ export default function Navbar() {
             ClaudeCurate
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ display: { xs: 'none', md: 'block' } }}>{user?.email}</Typography>
-          <Tooltip title="Copy webhook token">
+          <LanguageToggle />
+          <Tooltip title={t('nav.copyToken')}>
             <IconButton onClick={copyToken} size="small"><ContentCopyIcon fontSize="small" /></IconButton>
           </Tooltip>
-          <Button size="small" startIcon={<PersonIcon />} onClick={() => navigate('/profile')}>Profile</Button>
-          <Button size="small" startIcon={<LogoutIcon />} onClick={handleLogout} color="inherit">Logout</Button>
+          <Button size="small" startIcon={<PersonIcon />} onClick={() => navigate('/profile')}>{t('nav.profile')}</Button>
+          <Button size="small" startIcon={<LogoutIcon />} onClick={handleLogout} color="inherit">{t('nav.logout')}</Button>
         </Toolbar>
       </AppBar>
-      <Snackbar open={copied} autoHideDuration={2000} onClose={() => setCopied(false)} message="Webhook token copied!" />
+      <Snackbar open={copied} autoHideDuration={2000} onClose={() => setCopied(false)} message={t('nav.tokenCopied')} />
     </>
   )
 }

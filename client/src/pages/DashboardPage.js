@@ -1,22 +1,26 @@
 import React, { useState } from 'react'
 import { Box, Chip, CircularProgress, Fab, Grid, Stack, Typography, Alert } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add'
+import { useTranslation } from 'react-i18next'
 import Navbar from '../components/Navbar'
 import StatsBar from '../components/StatsBar'
 import TaskCard from '../components/TaskCard'
 import TaskModal from '../components/TaskModal'
 import { useTasks } from '../hooks/useTasks'
 
-const FILTERS = ['All', 'Pending', 'In Progress', 'Complete']
-const filterKey = { All: null, Pending: 'pending', 'In Progress': 'in_progress', Complete: 'complete' }
+const STATUS_KEYS = [null, 'pending', 'in_progress', 'complete']
 
 export default function DashboardPage() {
   const { tasks, loading, error, createTask, updateTask, deleteTask, toggleSubtask } = useTasks()
-  const [filter, setFilter] = useState('All')
+  const { t } = useTranslation()
+  const [filterIdx, setFilterIdx] = useState(0)
   const [modalOpen, setModalOpen] = useState(false)
   const [editTask, setEditTask] = useState(null)
 
-  const filtered = filterKey[filter] ? tasks.filter(t => t.status === filterKey[filter]) : tasks
+  const FILTER_LABELS = [t('dashboard.filterAll'), t('dashboard.filterPending'), t('dashboard.filterInProgress'), t('dashboard.filterComplete')]
+  const FILTER_NAMES = ['all', 'pending', 'in_progress', 'complete']
+
+  const filtered = STATUS_KEYS[filterIdx] ? tasks.filter(t => t.status === STATUS_KEYS[filterIdx]) : tasks
 
   const handleSave = async (data) => {
     if (editTask) await updateTask(editTask._id, data)
@@ -30,15 +34,15 @@ export default function DashboardPage() {
     <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
       <Navbar />
       <Box sx={{ px: { xs: 2, sm: 3, md: 4 }, py: 3, maxWidth: 1200, mx: 'auto' }}>
-        <Typography variant="h5" fontWeight={700} mb={3}>My Tasks</Typography>
+        <Typography variant="h5" fontWeight={700} mb={3}>{t('dashboard.myTasks')}</Typography>
 
         <StatsBar tasks={tasks} />
 
         <Stack direction="row" spacing={1} mb={3} flexWrap="wrap" useFlexGap>
-          {FILTERS.map(f => (
-            <Chip key={f} label={f} onClick={() => setFilter(f)}
-              color={filter === f ? 'primary' : 'default'}
-              variant={filter === f ? 'filled' : 'outlined'} />
+          {FILTER_LABELS.map((label, i) => (
+            <Chip key={label} label={label} onClick={() => setFilterIdx(i)}
+              color={filterIdx === i ? 'primary' : 'default'}
+              variant={filterIdx === i ? 'filled' : 'outlined'} />
           ))}
         </Stack>
 
@@ -49,7 +53,9 @@ export default function DashboardPage() {
         ) : filtered.length === 0 ? (
           <Box sx={{ textAlign: 'center', py: 8 }}>
             <Typography color="text.secondary">
-              {filter === 'All' ? 'No tasks yet. Create your first task!' : `No ${filter.toLowerCase()} tasks.`}
+              {filterIdx === 0
+                ? t('dashboard.noTasks')
+                : t('dashboard.noFilteredTasks', { filter: FILTER_NAMES[filterIdx] })}
             </Typography>
           </Box>
         ) : (

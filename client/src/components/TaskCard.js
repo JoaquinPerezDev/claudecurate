@@ -2,11 +2,12 @@ import React, { useState } from 'react'
 import { Box, Card, CardContent, Checkbox, Chip, IconButton, LinearProgress, Tooltip, Typography } from '@mui/material'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
+import { useTranslation } from 'react-i18next'
 
 const STATUS_COLORS = { pending: 'default', in_progress: 'primary', complete: 'success' }
-const STATUS_LABELS = { pending: 'Pending', in_progress: 'In Progress', complete: 'Complete' }
 
 export default function TaskCard({ task, onEdit, onDelete, onToggleSubtask }) {
+  const { t } = useTranslation()
   const [deleting, setDeleting] = useState(false)
 
   const handleDelete = async () => {
@@ -25,7 +26,7 @@ export default function TaskCard({ task, onEdit, onDelete, onToggleSubtask }) {
           <Typography variant="subtitle1" fontWeight={600} sx={{ flex: 1, mr: 1, textDecoration: task.status === 'complete' ? 'line-through' : 'none' }}>
             {task.title}
           </Typography>
-          <Chip label={STATUS_LABELS[task.status]} color={STATUS_COLORS[task.status]} size="small" />
+          <Chip label={t(`task.${task.status}`)} color={STATUS_COLORS[task.status]} size="small" />
         </Box>
 
         {task.description && (
@@ -37,7 +38,7 @@ export default function TaskCard({ task, onEdit, onDelete, onToggleSubtask }) {
         {totalSubs > 0 && (
           <Box sx={{ mb: 1.5 }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-              <Typography variant="caption" color="text.secondary">Subtasks</Typography>
+              <Typography variant="caption" color="text.secondary">{t('task.subtasks')}</Typography>
               <Typography variant="caption" color="text.secondary">{doneCount}/{totalSubs}</Typography>
             </Box>
             <LinearProgress variant="determinate" value={progress} sx={{ mb: 1, borderRadius: 4 }} color={progress === 100 ? 'success' : 'primary'} />
@@ -67,8 +68,8 @@ export default function TaskCard({ task, onEdit, onDelete, onToggleSubtask }) {
       </CardContent>
 
       <Box sx={{ display: 'flex', justifyContent: 'flex-end', px: 1.5, pb: 1, gap: 0.5 }}>
-        <Tooltip title="Edit"><IconButton size="small" onClick={() => onEdit(task)}><EditIcon fontSize="small" /></IconButton></Tooltip>
-        <Tooltip title="Delete"><IconButton size="small" color="error" onClick={handleDelete} disabled={deleting}><DeleteIcon fontSize="small" /></IconButton></Tooltip>
+        <Tooltip title={t('task.edit')}><IconButton size="small" onClick={() => onEdit(task)}><EditIcon fontSize="small" /></IconButton></Tooltip>
+        <Tooltip title={t('task.delete')}><IconButton size="small" color="error" onClick={handleDelete} disabled={deleting}><DeleteIcon fontSize="small" /></IconButton></Tooltip>
       </Box>
     </Card>
   )

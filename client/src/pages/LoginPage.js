@@ -1,10 +1,12 @@
 import React, { useState } from 'react'
 import { Link as RouterLink, useNavigate } from 'react-router-dom'
 import { Box, Button, Card, CardContent, Link, TextField, Typography, Alert } from '@mui/material'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '../context/AuthContext'
 
 export default function LoginPage() {
   const { login } = useAuth()
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const [form, setForm] = useState({ email: '', password: '' })
   const [errors, setErrors] = useState({})
@@ -13,8 +15,8 @@ export default function LoginPage() {
 
   const validate = () => {
     const e = {}
-    if (!form.email) e.email = 'Email is required'
-    if (!form.password) e.password = 'Password is required'
+    if (!form.email) e.email = t('auth.emailRequired')
+    if (!form.password) e.password = t('auth.passwordRequired')
     return e
   }
 
@@ -28,7 +30,7 @@ export default function LoginPage() {
       await login(form.email, form.password)
       navigate('/dashboard')
     } catch (err) {
-      setApiError(err.response?.data?.message || 'Login failed')
+      setApiError(err.response?.data?.message || t('auth.loginFailed'))
     } finally {
       setLoading(false)
     }
@@ -38,25 +40,25 @@ export default function LoginPage() {
     <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: 'background.default', px: 2 }}>
       <Card sx={{ width: '100%', maxWidth: 400 }}>
         <CardContent sx={{ p: { xs: 3, sm: 4 } }}>
-          <Typography variant="h5" fontWeight={700} mb={0.5}>Welcome back</Typography>
-          <Typography variant="body2" color="text.secondary" mb={3}>Sign in to ClaudeCurate</Typography>
+          <Typography variant="h5" fontWeight={700} mb={0.5}>{t('auth.welcomeBack')}</Typography>
+          <Typography variant="body2" color="text.secondary" mb={3}>{t('auth.signInTo')}</Typography>
 
           {apiError && <Alert severity="error" sx={{ mb: 2 }}>{apiError}</Alert>}
 
           <Box component="form" onSubmit={handleSubmit} noValidate>
-            <TextField fullWidth label="Email" type="email" value={form.email}
+            <TextField fullWidth label={t('auth.email')} type="email" value={form.email}
               onChange={e => { setForm(f => ({ ...f, email: e.target.value })); setErrors(er => ({ ...er, email: '' })) }}
               error={!!errors.email} helperText={errors.email} sx={{ mb: 2 }} />
-            <TextField fullWidth label="Password" type="password" value={form.password}
+            <TextField fullWidth label={t('auth.password')} type="password" value={form.password}
               onChange={e => { setForm(f => ({ ...f, password: e.target.value })); setErrors(er => ({ ...er, password: '' })) }}
               error={!!errors.password} helperText={errors.password} sx={{ mb: 3 }} />
             <Button fullWidth variant="contained" size="large" type="submit" disabled={loading}>
-              {loading ? 'Signing in…' : 'Sign in'}
+              {loading ? t('auth.signingIn') : t('auth.signIn')}
             </Button>
           </Box>
 
           <Typography variant="body2" textAlign="center" mt={2}>
-            No account? <Link component={RouterLink} to="/register">Create one</Link>
+            {t('auth.noAccount')} <Link component={RouterLink} to="/register">{t('auth.createOne')}</Link>
           </Typography>
         </CardContent>
       </Card>

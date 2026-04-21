@@ -4,6 +4,7 @@ import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline'
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked'
 import AutorenewIcon from '@mui/icons-material/Autorenew'
 import ListAltIcon from '@mui/icons-material/ListAlt'
+import { useTranslation } from 'react-i18next'
 
 function Stat({ icon, label, value, color }) {
   return (
@@ -16,6 +17,7 @@ function Stat({ icon, label, value, color }) {
 }
 
 export default function StatsBar({ tasks }) {
+  const { t } = useTranslation()
   const total = tasks.length
   const pending = tasks.filter(t => t.status === 'pending').length
   const inProgress = tasks.filter(t => t.status === 'in_progress').length
@@ -23,10 +25,10 @@ export default function StatsBar({ tasks }) {
 
   return (
     <Box sx={{ display: 'flex', gap: 1.5, mb: 3, flexWrap: 'wrap' }}>
-      <Stat icon={<ListAltIcon fontSize="small" />} label="Total" value={total} color="#5b4fcf" />
-      <Stat icon={<RadioButtonUncheckedIcon fontSize="small" />} label="Pending" value={pending} color="#9e9e9e" />
-      <Stat icon={<AutorenewIcon fontSize="small" />} label="In Progress" value={inProgress} color="#1976d2" />
-      <Stat icon={<CheckCircleOutlineIcon fontSize="small" />} label="Complete" value={complete} color="#10b981" />
+      <Stat icon={<ListAltIcon fontSize="small" />} label={t('stats.total')} value={total} color="#5b4fcf" />
+      <Stat icon={<RadioButtonUncheckedIcon fontSize="small" />} label={t('stats.pending')} value={pending} color="#9e9e9e" />
+      <Stat icon={<AutorenewIcon fontSize="small" />} label={t('stats.inProgress')} value={inProgress} color="#1976d2" />
+      <Stat icon={<CheckCircleOutlineIcon fontSize="small" />} label={t('stats.complete')} value={complete} color="#10b981" />
     </Box>
   )
 }

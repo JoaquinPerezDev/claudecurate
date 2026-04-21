@@ -12,6 +12,7 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft'
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight'
+import { useTranslation } from 'react-i18next'
 
 function CopyBlock({ code, label }) {
   const [copied, setCopied] = useState(false)
@@ -32,6 +33,7 @@ function CopyBlock({ code, label }) {
 }
 
 function TrackA({ webhookToken, apiUrl, onDone }) {
+  const { t } = useTranslation()
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
   const [activeStep, setActiveStep] = useState(0)
@@ -65,68 +67,67 @@ exit 0`
 
   const steps = [
     {
-      label: 'Download hook script',
+      label: t('onboarding.trackA.step1Label'),
       content: (
         <>
           <Typography variant="body2" color="text.secondary" mb={2}>
-            This script runs whenever Claude Code finishes a session. Save it as <code>~/claude-hook.sh</code> on your computer.
+            {t('onboarding.trackA.step1Desc')}
           </Typography>
-          <CopyBlock code={scriptContent} label="Copy script" />
+          <CopyBlock code={scriptContent} label={t('onboarding.trackA.copy')} />
           <Button variant="outlined" size="small"
             onClick={() => { const b = new Blob([scriptContent], { type: 'text/plain' }); const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'claude-hook.sh'; a.click() }}>
-            Download claude-hook.sh
+            {t('onboarding.trackA.downloadBtn')}
           </Button>
         </>
       )
     },
     {
-      label: 'Make it executable',
+      label: t('onboarding.trackA.step2Label'),
       content: (
         <>
           <Typography variant="body2" color="text.secondary" mb={2}>
-            Run this once in your terminal to give the script permission to execute.
+            {t('onboarding.trackA.step2Desc')}
           </Typography>
-          <CopyBlock code="chmod +x ~/claude-hook.sh" label="Copy command" />
+          <CopyBlock code="chmod +x ~/claude-hook.sh" label={t('onboarding.trackA.copyCommand')} />
         </>
       )
     },
     {
-      label: 'Configure Claude Code',
+      label: t('onboarding.trackA.step3Label'),
       content: (
         <>
           <Typography variant="body2" color="text.secondary" mb={2}>
-            Add this to <code>~/.claude/settings.json</code>. If the file doesn't exist, create it. This tells Claude Code to run your script when a session ends.
+            {t('onboarding.trackA.step3Desc')}
           </Typography>
-          <CopyBlock code={settingsJson} label="Copy JSON" />
+          <CopyBlock code={settingsJson} label={t('onboarding.trackA.copyJSON')} />
           <Button size="small" variant="text" href="https://code.claude.com/docs/en/hooks" target="_blank" rel="noopener">
-            Claude Code hooks docs ↗
+            {t('onboarding.trackA.step3Link')}
           </Button>
         </>
       )
     },
     {
-      label: 'Test the connection',
+      label: t('onboarding.trackA.step4Label'),
       content: (
         <>
           <Typography variant="body2" color="text.secondary" mb={2}>
-            Simulate a hook firing by running this in your terminal. Create a task with matching keywords first, then check your dashboard.
+            {t('onboarding.trackA.step4Desc')}
           </Typography>
-          <CopyBlock code={`echo '{"description":"test task completed"}' | bash ~/claude-hook.sh`} label="Copy test command" />
+          <CopyBlock code={`echo '{"description":"test task completed"}' | bash ~/claude-hook.sh`} label={t('onboarding.trackA.copyCommand')} />
           <Alert severity="info" sx={{ mt: 1 }}>
-            If a task's keywords match "test task completed", it will auto-complete within 30 seconds.
+            {t('onboarding.trackA.step4Alert')}
           </Alert>
         </>
       )
     },
     {
-      label: "You're connected!",
+      label: t('onboarding.trackA.step5Label'),
       content: (
         <Box textAlign="center" py={2}>
           <CheckCircleIcon sx={{ fontSize: 64, color: 'success.main', mb: 2 }} />
-          <Typography variant="h6" fontWeight={600} mb={1}>Claude Code is linked</Typography>
+          <Typography variant="h6" fontWeight={600} mb={1}>{t('onboarding.trackA.step5Title')}</Typography>
           <Typography variant="body2" color="text.secondary">
-            When Claude Code finishes a session, ClaudeCurate will automatically match and complete relevant tasks.
-            Add <strong>Claude keywords</strong> to your tasks to improve matching accuracy.
+            {t('onboarding.trackA.step5Desc')}
           </Typography>
         </Box>
       )
@@ -140,7 +141,9 @@ exit 0`
           {steps.map(s => <Step key={s.label}><StepLabel>{s.label}</StepLabel></Step>)}
         </Stepper>
       ) : (
-        <Typography variant="caption" color="text.secondary" mb={1} display="block">Step {activeStep + 1} of {steps.length}: {steps[activeStep].label}</Typography>
+        <Typography variant="caption" color="text.secondary" mb={1} display="block">
+          {t('onboarding.step', { current: activeStep + 1, total: steps.length })}: {steps[activeStep].label}
+        </Typography>
       )}
 
       <Paper variant="outlined" sx={{ p: { xs: 2, sm: 3 }, mb: 3, minHeight: 220 }}>
@@ -149,13 +152,13 @@ exit 0`
 
       {isMobile ? (
         <MobileStepper steps={steps.length} position="static" activeStep={activeStep}
-          nextButton={<Button size="small" onClick={activeStep === steps.length - 1 ? onDone : () => setActiveStep(s => s + 1)} endIcon={activeStep < steps.length - 1 ? <KeyboardArrowRightIcon /> : null}>{activeStep === steps.length - 1 ? 'Go to Dashboard' : 'Next'}</Button>}
-          backButton={<Button size="small" onClick={() => setActiveStep(s => s - 1)} disabled={activeStep === 0} startIcon={<KeyboardArrowLeftIcon />}>Back</Button>} />
+          nextButton={<Button size="small" onClick={activeStep === steps.length - 1 ? onDone : () => setActiveStep(s => s + 1)} endIcon={activeStep < steps.length - 1 ? <KeyboardArrowRightIcon /> : null}>{activeStep === steps.length - 1 ? t('onboarding.goToDashboard') : t('onboarding.next')}</Button>}
+          backButton={<Button size="small" onClick={() => setActiveStep(s => s - 1)} disabled={activeStep === 0} startIcon={<KeyboardArrowLeftIcon />}>{t('onboarding.back')}</Button>} />
       ) : (
         <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-          <Button onClick={() => setActiveStep(s => s - 1)} disabled={activeStep === 0}>Back</Button>
+          <Button onClick={() => setActiveStep(s => s - 1)} disabled={activeStep === 0}>{t('onboarding.back')}</Button>
           <Button variant="contained" onClick={activeStep === steps.length - 1 ? onDone : () => setActiveStep(s => s + 1)}>
-            {activeStep === steps.length - 1 ? 'Go to Dashboard' : 'Next'}
+            {activeStep === steps.length - 1 ? t('onboarding.goToDashboard') : t('onboarding.next')}
           </Button>
         </Box>
       )}
@@ -164,6 +167,7 @@ exit 0`
 }
 
 function TrackB({ webhookToken, apiUrl, onDone }) {
+  const { t } = useTranslation()
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
   const [activeStep, setActiveStep] = useState(0)
@@ -190,68 +194,68 @@ function TrackB({ webhookToken, apiUrl, onDone }) {
 
   const steps = [
     {
-      label: 'Your webhook token',
+      label: t('onboarding.trackB.step1Label'),
       content: (
         <>
           <Typography variant="body2" color="text.secondary" mb={2}>
-            This token identifies your account. It's already embedded in the config snippet in the next step.
+            {t('onboarding.trackB.step1Desc')}
           </Typography>
-          <CopyBlock code={webhookToken} label="Copy token" />
-          <Alert severity="info">Keep this token private — it grants access to your task list.</Alert>
+          <CopyBlock code={webhookToken} label={t('onboarding.trackB.copyToken')} />
+          <Alert severity="info">{t('onboarding.trackB.step1Alert')}</Alert>
         </>
       )
     },
     {
-      label: 'Add MCP config',
+      label: t('onboarding.trackB.step2Label'),
       content: (
         <>
           <Typography variant="body2" color="text.secondary" mb={1}>
-            Add this to your Claude Desktop config file. Your token is already filled in.
+            {t('onboarding.trackB.step2Desc')}
           </Typography>
           <Box mb={1}>
             <Chip label={isMac ? 'macOS' : 'Windows'} size="small" color="primary" sx={{ mr: 1 }} />
-            <CopyBlock code={configPath} label="Copy path" />
+            <CopyBlock code={configPath} label={t('onboarding.trackB.copyPath')} />
           </Box>
-          <CopyBlock code={mcpConfig} label="Copy config" />
+          <CopyBlock code={mcpConfig} label={t('onboarding.trackB.copyConfig')} />
         </>
       )
     },
     {
-      label: 'Restart Claude Desktop',
+      label: t('onboarding.trackB.step3Label'),
       content: (
         <Box py={2}>
           <Typography variant="body2" color="text.secondary" mb={2}>
-            Fully quit and reopen Claude Desktop so it loads the new MCP server configuration.
+            {t('onboarding.trackB.step3Desc')}
           </Typography>
-          <Alert severity="warning">Make sure to <strong>fully quit</strong> (not just close the window) before reopening.</Alert>
+          <Alert severity="warning">{t('onboarding.trackB.step3Alert')}</Alert>
         </Box>
       )
     },
     {
-      label: 'Add custom instruction',
+      label: t('onboarding.trackB.step4Label'),
       content: (
         <>
           <Typography variant="body2" color="text.secondary" mb={2}>
-            This tells Claude to automatically log what it accomplished at the end of every conversation.
+            {t('onboarding.trackB.step4Desc')}
           </Typography>
-          <CopyBlock code={customInstruction} label="Copy instruction" />
+          <CopyBlock code={customInstruction} label={t('onboarding.trackB.copyInstruction')} />
           <Typography variant="body2" color="text.secondary">
-            In Claude Desktop: <strong>Settings → Custom Instructions</strong> → paste the text above.
+            {t('onboarding.trackB.step4Where')}
           </Typography>
         </>
       )
     },
     {
-      label: "You're connected!",
+      label: t('onboarding.trackB.step5Label'),
       content: (
         <Box textAlign="center" py={2}>
           <CheckCircleIcon sx={{ fontSize: 64, color: 'success.main', mb: 2 }} />
-          <Typography variant="h6" fontWeight={600} mb={1}>Claude Desktop is linked</Typography>
+          <Typography variant="h6" fontWeight={600} mb={1}>{t('onboarding.trackB.step5Title')}</Typography>
           <Typography variant="body2" color="text.secondary" mb={2}>
-            Claude Desktop will call ClaudeCurate at the end of each conversation and auto-complete matching tasks.
+            {t('onboarding.trackB.step5Desc')}
           </Typography>
           <Alert severity="info" sx={{ textAlign: 'left' }}>
-            This relies on Claude following your custom instruction — it works ~95% of the time.
+            {t('onboarding.trackB.step5Note')}
           </Alert>
         </Box>
       )
@@ -265,7 +269,9 @@ function TrackB({ webhookToken, apiUrl, onDone }) {
           {steps.map(s => <Step key={s.label}><StepLabel>{s.label}</StepLabel></Step>)}
         </Stepper>
       ) : (
-        <Typography variant="caption" color="text.secondary" mb={1} display="block">Step {activeStep + 1} of {steps.length}: {steps[activeStep].label}</Typography>
+        <Typography variant="caption" color="text.secondary" mb={1} display="block">
+          {t('onboarding.step', { current: activeStep + 1, total: steps.length })}: {steps[activeStep].label}
+        </Typography>
       )}
 
       <Paper variant="outlined" sx={{ p: { xs: 2, sm: 3 }, mb: 3, minHeight: 220 }}>
@@ -274,13 +280,13 @@ function TrackB({ webhookToken, apiUrl, onDone }) {
 
       {isMobile ? (
         <MobileStepper steps={steps.length} position="static" activeStep={activeStep}
-          nextButton={<Button size="small" onClick={activeStep === steps.length - 1 ? onDone : () => setActiveStep(s => s + 1)} endIcon={activeStep < steps.length - 1 ? <KeyboardArrowRightIcon /> : null}>{activeStep === steps.length - 1 ? 'Go to Dashboard' : 'Next'}</Button>}
-          backButton={<Button size="small" onClick={() => setActiveStep(s => s - 1)} disabled={activeStep === 0} startIcon={<KeyboardArrowLeftIcon />}>Back</Button>} />
+          nextButton={<Button size="small" onClick={activeStep === steps.length - 1 ? onDone : () => setActiveStep(s => s + 1)} endIcon={activeStep < steps.length - 1 ? <KeyboardArrowRightIcon /> : null}>{activeStep === steps.length - 1 ? t('onboarding.goToDashboard') : t('onboarding.next')}</Button>}
+          backButton={<Button size="small" onClick={() => setActiveStep(s => s - 1)} disabled={activeStep === 0} startIcon={<KeyboardArrowLeftIcon />}>{t('onboarding.back')}</Button>} />
       ) : (
         <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-          <Button onClick={() => setActiveStep(s => s - 1)} disabled={activeStep === 0}>Back</Button>
+          <Button onClick={() => setActiveStep(s => s - 1)} disabled={activeStep === 0}>{t('onboarding.back')}</Button>
           <Button variant="contained" onClick={activeStep === steps.length - 1 ? onDone : () => setActiveStep(s => s + 1)}>
-            {activeStep === steps.length - 1 ? 'Go to Dashboard' : 'Next'}
+            {activeStep === steps.length - 1 ? t('onboarding.goToDashboard') : t('onboarding.next')}
           </Button>
         </Box>
       )}
@@ -288,19 +294,20 @@ function TrackB({ webhookToken, apiUrl, onDone }) {
   )
 }
 
-const METHOD_CARDS = [
-  { id: 'code', icon: <TerminalIcon sx={{ fontSize: 40 }} />, title: 'Claude Code (CLI)', subtitle: 'I use `claude` in my terminal', color: '#5b4fcf' },
-  { id: 'desktop', icon: <DesktopWindowsIcon sx={{ fontSize: 40 }} />, title: 'Claude Desktop app', subtitle: 'I use the desktop app', color: '#1976d2' },
-  { id: 'manual', icon: <EditNoteIcon sx={{ fontSize: 40 }} />, title: 'Set up later', subtitle: "I'll track tasks manually for now", color: '#9e9e9e' }
-]
-
 export default function OnboardingPage() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const [method, setMethod] = useState(null)
   const [snack, setSnack] = useState('')
 
   const webhookToken = localStorage.getItem('webhookToken') || ''
   const apiUrl = process.env.REACT_APP_API_URL || window.location.origin
+
+  const METHOD_CARDS = [
+    { id: 'code', icon: <TerminalIcon sx={{ fontSize: 40 }} />, title: t('onboarding.claudeCodeTitle'), subtitle: t('onboarding.claudeCodeSubtitle'), color: '#5b4fcf' },
+    { id: 'desktop', icon: <DesktopWindowsIcon sx={{ fontSize: 40 }} />, title: t('onboarding.claudeDesktopTitle'), subtitle: t('onboarding.claudeDesktopSubtitle'), color: '#1976d2' },
+    { id: 'manual', icon: <EditNoteIcon sx={{ fontSize: 40 }} />, title: t('onboarding.manualTitle'), subtitle: t('onboarding.manualSubtitle'), color: '#9e9e9e' }
+  ]
 
   const handleDone = () => {
     localStorage.setItem('onboardingComplete', 'true')
@@ -311,9 +318,9 @@ export default function OnboardingPage() {
     return (
       <Box sx={{ minHeight: '100vh', bgcolor: 'background.default', display: 'flex', alignItems: 'center', justifyContent: 'center', px: 2 }}>
         <Box sx={{ width: '100%', maxWidth: 600 }}>
-          <Typography variant="h5" fontWeight={700} textAlign="center" mb={1}>Connect Claude</Typography>
+          <Typography variant="h5" fontWeight={700} textAlign="center" mb={1}>{t('onboarding.connectClaude')}</Typography>
           <Typography variant="body2" color="text.secondary" textAlign="center" mb={4}>
-            How do you use Claude? We'll walk you through linking it to ClaudeCurate.
+            {t('onboarding.howDoYouUse')}
           </Typography>
           <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 2 }}>
             {METHOD_CARDS.map(m => (
@@ -337,12 +344,12 @@ export default function OnboardingPage() {
       <Box sx={{ minHeight: '100vh', bgcolor: 'background.default', display: 'flex', alignItems: 'center', justifyContent: 'center', px: 2 }}>
         <Card sx={{ maxWidth: 480, width: '100%', p: { xs: 3, sm: 4 }, textAlign: 'center' }}>
           <EditNoteIcon sx={{ fontSize: 64, color: 'text.secondary', mb: 2 }} />
-          <Typography variant="h6" fontWeight={600} mb={1}>No problem!</Typography>
+          <Typography variant="h6" fontWeight={600} mb={1}>{t('onboarding.manualTitle')}</Typography>
           <Typography variant="body2" color="text.secondary" mb={3}>
-            ClaudeCurate works great as a standalone task tracker. You can connect Claude at any time from <strong>Profile → Claude Integration</strong>.
+            {t('onboarding.manualMessage')}
           </Typography>
-          <Button variant="contained" onClick={handleDone} fullWidth>Go to Dashboard</Button>
-          <Button sx={{ mt: 1 }} onClick={() => setMethod(null)} fullWidth>Go back</Button>
+          <Button variant="contained" onClick={handleDone} fullWidth>{t('onboarding.goToDashboard')}</Button>
+          <Button sx={{ mt: 1 }} onClick={() => setMethod(null)} fullWidth>{t('onboarding.goBack')}</Button>
         </Card>
       </Box>
     )
@@ -352,9 +359,9 @@ export default function OnboardingPage() {
     <Box sx={{ minHeight: '100vh', bgcolor: 'background.default', px: 2, py: 4 }}>
       <Box sx={{ maxWidth: 720, mx: 'auto' }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 4 }}>
-          <Button onClick={() => setMethod(null)} size="small">← Back</Button>
+          <Button onClick={() => setMethod(null)} size="small">{t('onboarding.back')}</Button>
           <Typography variant="h6" fontWeight={700}>
-            {method === 'code' ? 'Connect Claude Code' : 'Connect Claude Desktop'}
+            {method === 'code' ? t('onboarding.connectCodeTitle') : t('onboarding.connectDesktopTitle')}
           </Typography>
         </Box>
         {method === 'code'
