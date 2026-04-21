@@ -1,6 +1,6 @@
 import React from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import { ThemeProvider, createTheme, CssBaseline } from '@mui/material'
+import { AppThemeProvider } from './context/ThemeContext'
 import { AuthProvider } from './context/AuthContext'
 import PrivateRoute from './components/PrivateRoute'
 import LoginPage from './pages/LoginPage'
@@ -9,34 +9,9 @@ import DashboardPage from './pages/DashboardPage'
 import OnboardingPage from './pages/OnboardingPage'
 import ProfilePage from './pages/ProfilePage'
 
-const theme = createTheme({
-  typography: {
-    fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif'
-  },
-  palette: {
-    primary: { main: '#5b4fcf' },
-    secondary: { main: '#10b981' },
-    background: { default: '#f8f9fc' }
-  },
-  shape: { borderRadius: 10 },
-  components: {
-    MuiButton: {
-      styleOverrides: {
-        root: { textTransform: 'none', fontWeight: 600 }
-      }
-    },
-    MuiCard: {
-      styleOverrides: {
-        root: { boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }
-      }
-    }
-  }
-})
-
 export default function App() {
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
+    <AppThemeProvider>
       <AuthProvider>
         <BrowserRouter>
           <Routes>
@@ -49,6 +24,6 @@ export default function App() {
           </Routes>
         </BrowserRouter>
       </AuthProvider>
-    </ThemeProvider>
+    </AppThemeProvider>
   )
 }

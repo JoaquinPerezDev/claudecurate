@@ -8,6 +8,7 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../context/AuthContext'
 import LanguageToggle from './LanguageToggle'
+import ThemeToggle from './ThemeToggle'
 
 export default function Navbar() {
   const { user, logout } = useAuth()
@@ -30,6 +31,15 @@ export default function Navbar() {
     const route = location.pathname
     return (
       <>
+        <AppBar position="sticky" color="inherit" elevation={0} sx={{ borderBottom: '1px solid', borderColor: 'divider' }}>
+          <Toolbar variant="dense" sx={{ gap: 0.5, minHeight: 44 }}>
+            <Typography variant="subtitle1" fontWeight={700} color="primary" sx={{ flex: 1, cursor: 'pointer' }} onClick={() => navigate('/dashboard')}>
+              ClaudeCurate
+            </Typography>
+            <LanguageToggle />
+            <ThemeToggle />
+          </Toolbar>
+        </AppBar>
         <Box sx={{ pb: 7 }} />
         <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 100 }} elevation={3}>
           <BottomNavigation value={route} onChange={(_, val) => navigate(val)} showLabels>
@@ -51,6 +61,7 @@ export default function Navbar() {
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ display: { xs: 'none', md: 'block' } }}>{user?.email}</Typography>
           <LanguageToggle />
+          <ThemeToggle />
           <Tooltip title={t('nav.copyToken')}>
             <IconButton onClick={copyToken} size="small"><ContentCopyIcon fontSize="small" /></IconButton>
           </Tooltip>
