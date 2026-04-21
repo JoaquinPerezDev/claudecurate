@@ -1,28 +1,27 @@
-import mongoose from 'mongoose'
-import dotenv from 'dotenv'
-import User from '../models/User.js'
-import Task from '../models/Task.js'
-import { matchTask } from '../utils/matchTask.js'
+const API_URL = process.env.API_URL
+const WEBHOOK_TOKEN = process.env.WEBHOOK_TOKEN
 
-dotenv.config({ path: new URL('../../.env', import.meta.url).pathname })
-
-let connected = false
-async function ensureConnected() {
-  if (!connected) {
-    await mongoose.connect(process.env.MONGO_URI)
-    connected = true
+async function apiFetch(path, options = {}) {
+  const res = await fetch(`${API_URL}${path}`, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      'x-webhook-token': WEBHOOK_TOKEN,
+      ...(options.headers || {})
+    }
+  })
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}))
+    throw new Error(body.message || `HTTP ${res.status}`)
   }
+  return res.json()
 }
 
 export const toolDefinitions = [
   {
     name: 'list_tasks',
-    description: 'List the user\'s pending and in-progress tasks in ClaudeCurate.',
-    inputSchema: {
-      type: 'object',
-      properties: {},
-      required: []
-    }
+    description: "List the user's pending and in-progress tasks in ClaudeCurate.",
+    inputSchema: { type: 'object', properties: {}, required: [] }
   },
   {
     name: 'complete_task',
@@ -48,14 +47,9 @@ export const toolDefinitions = [
   }
 ]
 
-export async function handleTool(name, args, webhookToken) {
-  await ensureConnected()
-
-  const user = await User.findOne({ webhookToken })
-  if (!user) throw new Error('Invalid webhook token')
-
+export async function handleTool(name, args) {
   if (name === 'list_tasks') {
-    const tasks = await Task.find({ user: user._id, status: { $ne: 'complete' } }).sort({ createdAt: -1 })
+    const tasks = await apiFetch('/webhook/mcp/tasks')
     return {
       content: [{
         type: 'text',
@@ -67,21 +61,18 @@ export async function handleTool(name, args, webhookToken) {
   }
 
   if (name === 'complete_task') {
-    const task = await Task.findOne({ _id: args.taskId, user: user._id })
-    if (!task) throw new Error('Task not found')
-    task.status = 'complete'
-    task.completedAt = new Date()
-    await task.save()
+    const task = await apiFetch(`/webhook/mcp/tasks/${args.taskId}/complete`, { method: 'POST' })
     return { content: [{ type: 'text', text: `Marked "${task.title}" as complete.` }] }
   }
 
   if (name === 'log_session') {
-    const tasks = await Task.find({ user: user._id, status: { $ne: 'complete' } })
-    const result = matchTask(args.description, tasks)
+    const result = await apiFetch('/webhook/claude-hook', {
+      method: 'POST',
+      body: JSON.stringify({ webhookToken: WEBHOOK_TOKEN, taskDescription: args.description })
+    })
     if (!result.matched) {
       return { content: [{ type: 'text', text: 'Session logged. No matching task found.' }] }
     }
-    await result.task.save()
     const msg = result.subtask
       ? `Completed subtask "${result.subtask.title}"${result.autoCompletedParent ? ` and parent task "${result.task.title}"` : ''}.`
       : `Completed task "${result.task.title}".`

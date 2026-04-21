@@ -5,8 +5,10 @@ import { ListToolsRequestSchema, CallToolRequestSchema } from '@modelcontextprot
 import { toolDefinitions, handleTool } from './tools.js'
 
 const WEBHOOK_TOKEN = process.env.WEBHOOK_TOKEN
-if (!WEBHOOK_TOKEN) {
-  console.error('WEBHOOK_TOKEN environment variable is required')
+const API_URL = process.env.API_URL
+
+if (!WEBHOOK_TOKEN || !API_URL) {
+  console.error('WEBHOOK_TOKEN and API_URL environment variables are required')
   process.exit(1)
 }
 
@@ -21,7 +23,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
 
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
   try {
-    return await handleTool(request.params.name, request.params.arguments || {}, WEBHOOK_TOKEN)
+    return await handleTool(request.params.name, request.params.arguments || {})
   } catch (err) {
     return {
       content: [{ type: 'text', text: `Error: ${err.message}` }],

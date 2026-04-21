@@ -1,0 +1,19 @@
+{
+  "name": "claudecurate-mcp",
+  "version": "1.0.0",
+  "description": "MCP server for ClaudeCurate task management",
+  "type": "module",
+  "bin": {
+    "claudecurate-mcp": "./server.js"
+  },
+  "files": [
+    "server.js",
+    "tools.js"
+  ],
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
