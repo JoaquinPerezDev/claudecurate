@@ -49,7 +49,7 @@ export const toolDefinitions = [
 
 export async function handleTool(name, args) {
   if (name === 'list_tasks') {
-    const tasks = await apiFetch('/webhook/mcp/tasks')
+    const tasks = await apiFetch('/api/webhook/mcp/tasks')
     return {
       content: [{
         type: 'text',
@@ -61,12 +61,12 @@ export async function handleTool(name, args) {
   }
 
   if (name === 'complete_task') {
-    const task = await apiFetch(`/webhook/mcp/tasks/${args.taskId}/complete`, { method: 'POST' })
+    const task = await apiFetch(`/api/webhook/mcp/tasks/${args.taskId}/complete`, { method: 'POST' })
     return { content: [{ type: 'text', text: `Marked "${task.title}" as complete.` }] }
   }
 
   if (name === 'log_session') {
-    const result = await apiFetch('/webhook/claude-hook', {
+    const result = await apiFetch('/api/webhook/claude-hook', {
       method: 'POST',
       body: JSON.stringify({ webhookToken: WEBHOOK_TOKEN, taskDescription: args.description })
     })
