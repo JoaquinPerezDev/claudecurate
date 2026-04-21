@@ -1,5 +1,8 @@
+import nodeFetch from 'node-fetch'
+
 const API_URL = process.env.API_URL
 const WEBHOOK_TOKEN = process.env.WEBHOOK_TOKEN
+const fetch = globalThis.fetch ?? nodeFetch
 
 async function apiFetch(path, options = {}) {
   const res = await fetch(`${API_URL}${path}`, {
